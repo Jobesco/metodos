@@ -56,9 +56,8 @@ def runge_kutta(y0,t0,h,passos,funcao):
             t_ant = passo*h
             saida.write(str(passo) + ' ' + str(y_n) + '\n')
 
-def adam_bashforth(funcao,): #[1] = y(0) , [2] = t(0) , [3] = h , [4] = qtd de passos , [5] = funcao, [6] = ordem
+def adam_bashforth(funcao): #[1] = y(0) , [2] = t(0) , [3] = h , [4] = qtd de passos , [5] = funcao, [6] = ordem
     t_atual = float(linha[-5])
-    t_inicial = float(linha[-5])
     h = float(linha[-4])
     saida.write('Metodo de Adam-Bashforth\ny( ' + linha[-5] + ' ) = ' + linha[1] + '\nh = ' + linha[-4] + '\n')
     if int(linha[-1]) == 2: lista_y = [float(linha[1]),float(linha[2])] #[0] = yn , [1] = yn-1...
@@ -68,11 +67,14 @@ def adam_bashforth(funcao,): #[1] = y(0) , [2] = t(0) , [3] = h , [4] = qtd de p
     elif int(linha[-1]) == 6: lista_y = [float(linha[1]),float(linha[2]),float(linha[3]),float(linha[4]),float(linha[5]),float(linha[6])]
     elif int(linha[-1]) == 7: lista_y = [float(linha[1]),float(linha[2]),float(linha[3]),float(linha[4]),float(linha[5]),float(linha[6]),float(linha[7])]
     elif int(linha[-1]) == 8: lista_y = [float(linha[1]),float(linha[2]),float(linha[3]),float(linha[4]),float(linha[5]),float(linha[6]),float(linha[7]),float(linha[8])]
-    print(lista_y)
+    # lista_y.reverse()
     for passo in range(int(linha[-3])+1):
-        if passo == 0:
-            saida.write(str(passo) + ' ' + str(lista_y[0]) + '\n')
+        print('estou no passo ' + str(passo))
+        if passo < int(linha[-1]):
+            saida.write(str(passo) + ' ' + str(lista_y[passo]) + '\n')
         else:
+            lista_y.reverse()
+            print(lista_y)
             if int(linha[-1]) == 2: equacao = bashforth(lista_y[0],funcao,float(linha[-4]),t_atual,int(linha[-1]),lista_y[0],lista_y[1])
             elif int(linha[-1]) == 3: equacao = bashforth(lista_y[0],funcao,float(linha[-4]),t_atual,int(linha[-1]),lista_y[0],lista_y[1],lista_y[2])
             elif int(linha[-1]) == 4: equacao = bashforth(lista_y[0],funcao,float(linha[-4]),t_atual,int(linha[-1]),lista_y[0],lista_y[1],lista_y[2],lista_y[3])
@@ -81,12 +83,12 @@ def adam_bashforth(funcao,): #[1] = y(0) , [2] = t(0) , [3] = h , [4] = qtd de p
             elif int(linha[-1]) == 7: equacao = bashforth(lista_y[0],funcao,float(linha[-4]),t_atual,int(linha[-1]),lista_y[0],lista_y[1],lista_y[2],lista_y[3],lista_y[4],lista_y[5],lista_y[6])
             elif int(linha[-1]) == 8: equacao = bashforth(lista_y[0],funcao,float(linha[-4]),t_atual,int(linha[-1]),lista_y[0],lista_y[1],lista_y[2],lista_y[3],lista_y[4],lista_y[5],lista_y[6],lista_y[7])
             saida.write(str(passo) + ' ' + str(equacao) + '\n')
-            lista_y.pop()
-            lista_y.insert(0,equacao)
-            t_atual = h*passo + t_inicial
-
-            print(h)
-            print(t_atual)
+            lista_y.reverse()
+            lista_y.pop(0)
+            lista_y.append(equacao)
+            # lista_y.pop()
+            # lista_y.insert(0,equacao)
+            t_atual += h
             
 
     
@@ -94,45 +96,46 @@ def bashforth(y0,funcao,h,t0,ordem, y1 = 0, y2 = 0, y3 = 0, y4 = 0, y5 = 0, y6 =
     # print( (1901/720)*h*funcao.evalf(subs={t:t0,y:y1}) + (-1387/360)*h*funcao.evalf(subs={t:t0-h,y:y2}) 
     # + (109/30)*h*funcao.evalf(subs={t:t0-h*2,y:y3}) + (-637/360)*h*funcao.evalf(subs={t:t0-h*3,y:y4}) 
     # + (251/720)*h*funcao.evalf(subs={t:t0-h*4,y:y5}) )
-    return (y0 + ordem_bashforth[ordem][0]*h*funcao.evalf(subs={t:t0,y:y1}) + ordem_bashforth[ordem][1]*h*funcao.evalf(subs={t:t0-h,y:y2}) 
-    + ordem_bashforth[ordem][2]*h*funcao.evalf(subs={t:t0-h*2,y:y3}) + ordem_bashforth[ordem][3]*h*funcao.evalf(subs={t:t0-h*3,y:y4}) 
-    + ordem_bashforth[ordem][4]*h*funcao.evalf(subs={t:t0-h*4,y:y5}) + ordem_bashforth[ordem][5]*h*funcao.evalf(subs={t:t0-h*5,y:y6}) 
-    + ordem_bashforth[ordem][6]*h*funcao.evalf(subs={t:t0-h*6,y:y7}) + ordem_bashforth[ordem][7]*h*funcao.evalf(subs={t:t0-h*7,y:y8}))
+    retorno = y0 + ordem_bashforth[ordem][0]*h*funcao.evalf(subs={t:t0,y:y1}) + ordem_bashforth[ordem][1]*h*funcao.evalf(subs={t:t0-h,y:y2})
+    retorno += ordem_bashforth[ordem][2]*h*funcao.evalf(subs={t:t0-h*2,y:y3}) + ordem_bashforth[ordem][3]*h*funcao.evalf(subs={t:t0-h*3,y:y4})
+    retorno += ordem_bashforth[ordem][4]*h*funcao.evalf(subs={t:t0-h*4,y:y5}) + ordem_bashforth[ordem][5]*h*funcao.evalf(subs={t:t0-h*5,y:y6})
+    retorno += ordem_bashforth[ordem][6]*h*funcao.evalf(subs={t:t0-h*6,y:y7}) + ordem_bashforth[ordem][7]*h*funcao.evalf(subs={t:t0-h*7,y:y8})
+    return retorno
 
 def adam_moulton(funcao): #use bashforth p prever
     t_atual = float(linha[-5])
-    saida.write('Metodo de Adam-Moulton\ny( ' + linha[-5] + ' ) = ' + linha[1] + '\nh = ' + linha[-4] + '\n')#[0] = yn , [1] = yn-1...
-    if int(linha[-1]) == 2: lista_y = [float(linha[1]),float(linha[2])] 
-    elif int(linha[-1]) == 3: lista_y = [float(linha[1]),float(linha[2]),float(linha[3])]
-    elif int(linha[-1]) == 4: lista_y = [float(linha[1]),float(linha[2]),float(linha[3]),float(linha[4])]
-    elif int(linha[-1]) == 5: lista_y = [float(linha[1]),float(linha[2]),float(linha[3]),float(linha[4]),float(linha[5])]
-    elif int(linha[-1]) == 6: lista_y = [float(linha[1]),float(linha[2]),float(linha[3]),float(linha[4]),float(linha[5]),float(linha[6])]
-    elif int(linha[-1]) == 7: lista_y = [float(linha[1]),float(linha[2]),float(linha[3]),float(linha[4]),float(linha[5]),float(linha[6]),float(linha[7])]
-    elif int(linha[-1]) == 8: lista_y = [float(linha[1]),float(linha[2]),float(linha[3]),float(linha[4]),float(linha[5]),float(linha[6]),float(linha[7]),float(linha[8])]
-    print(lista_y)
+    # saida.write('Metodo de Adam-Moulton\ny( ' + linha[-5] + ' ) = ' + linha[1] + '\nh = ' + linha[-4] + '\n')#[0] = yn , [1] = yn-1...
+    # if int(linha[-1]) == 2: lista_y = [float(linha[1]),float(linha[2])] 
+    # elif int(linha[-1]) == 3: lista_y = [float(linha[1]),float(linha[2]),float(linha[3])]
+    # elif int(linha[-1]) == 4: lista_y = [float(linha[1]),float(linha[2]),float(linha[3]),float(linha[4])]
+    # elif int(linha[-1]) == 5: lista_y = [float(linha[1]),float(linha[2]),float(linha[3]),float(linha[4]),float(linha[5])]
+    # elif int(linha[-1]) == 6: lista_y = [float(linha[1]),float(linha[2]),float(linha[3]),float(linha[4]),float(linha[5]),float(linha[6])]
+    # elif int(linha[-1]) == 7: lista_y = [float(linha[1]),float(linha[2]),float(linha[3]),float(linha[4]),float(linha[5]),float(linha[6]),float(linha[7])]
+    # elif int(linha[-1]) == 8: lista_y = [float(linha[1]),float(linha[2]),float(linha[3]),float(linha[4]),float(linha[5]),float(linha[6]),float(linha[7]),float(linha[8])]
+    # print(lista_y)
 
-    for passo in range(int(linha[-3])+1):
-        if passo == 0:
-            saida.write(str(passo) + ' ' + str(lista_y[0]) + '\n')
-        else:
-            if int(linha[-1]) == 2:
-                equacao = lista_y[0] + moulton(funcao,float(linha[-4]),t_atual,int(linha[-1]),lista_y[0]) + ordem_moulton[int(linha[-1])][1]*float(linha[-4])*funcao.evalf(subs={t: t_atual + float(linha[-4]) , y: bashforth(lista_y[0],funcao,float(linha[-4]),t_atual+float(linha[-4]),int(linha[-1]),lista_y[1],lista_y[2])})
-            elif int(linha[-1]) == 3:
-                equacao = lista_y[0] + moulton(funcao,float(linha[-4]),t_atual,int(linha[-1]),lista_y[0],lista_y[1]) + ordem_moulton[int(linha[-1])][2]*funcao.evalf(subs={t: t_atual+float(linha[-4]), y: bashforth(lista_y[0],funcao,float(linha[-4]),t_atual+float(linha[-4]),int(linha[-1]),lista_y[1],lista_y[2]),lista_y[3]})
-            elif int(linha[-1]) == 4:
-                equacao = lista_y[0] + moulton(funcao,float(linha[-4]),t_atual,int(linha[-1]),lista_y[0],lista_y[1],lista_y[2]) + ordem_moulton[int(linha[-1])][3]*(funcao.evalf(subs={t: t_atual+float(linha[-4]), y: bashforth(lista_y[0],funcao,float(linha[-4]),t_atual+float(linha[-4]),int(linha[-1]),lista_y[1],lista_y[2]),lista_y[3],lista_y[4]}))
-            elif int(linha[-1]) == 5:
-                equacao = lista_y[0] + moulton(funcao,float(linha[-4]),t_atual,int(linha[-1]),lista_y[0],lista_y[1],lista_y[2],lista_y[3]) + ordem_moulton[int(linha[-1])][4]*(funcao.evalf(subs={t: t_atual+float(linha[-4]), y: bashforth(lista_y[0],funcao,float(linha[-4]),t_atual+float(linha[-4]),int(linha[-1]),lista_y[1],lista_y[2]),lista_y[3],lista_y[4],lista_y[5]}))
-            elif int(linha[-1]) == 6:
-                equacao = lista_y[0] + moulton(funcao,float(linha[-4]),t_atual,int(linha[-1]),lista_y[0],lista_y[1],lista_y[2],lista_y[3],lista_y[4]) + ordem_moulton[int(linha[-1])][5]*(funcao.evalf(subs={t: t_atual+float(linha[-4]), y: bashforth(lista_y[0],funcao,float(linha[-4]),t_atual+float(linha[-4]),int(linha[-1]),lista_y[1],lista_y[2]),lista_y[3],lista_y[4],lista_y[5],lista_y[6]}))
-            elif int(linha[-1]) == 7:
-                equacao = lista_y[0] + moulton(funcao,float(linha[-4]),t_atual,int(linha[-1]),lista_y[0],lista_y[1],lista_y[2],lista_y[3],lista_y[4],lista_y[5]) + ordem_moulton[int(linha[-1])][6]*(funcao.evalf(subs={t: t_atual+float(linha[-4]), y: bashforth(lista_y[0],funcao,float(linha[-4]),t_atual+float(linha[-4]),int(linha[-1]),lista_y[1],lista_y[2]),lista_y[3],lista_y[4],lista_y[5],lista_y[6],lista_y[7]}))
-            elif int(linha[-1]) == 8:
-                equacao = lista_y[0] + moulton(funcao,float(linha[-4]),t_atual,int(linha[-1]),lista_y[0],lista_y[1],lista_y[2],lista_y[3],lista_y[4],lista_y[5],lista_y[6]) + ordem_moulton[int(linha[-1])][7]*(funcao.evalf(subs={t: t_atual+float(linha[-4]), y: bashforth(lista_y[0],funcao,float(linha[-4]),t_atual+float(linha[-4]),int(linha[-1]),lista_y[1],lista_y[2]),lista_y[3],lista_y[4],lista_y[5],lista_y[6],lista_y[7],lista_y[8]}))
-            saida.write(str(passo) + ' ' + str(equacao) + '\n')
-            lista_y.pop()
-            lista_y.insert(0,equacao)
-            t_atual += float(linha[-5])
+    # for passo in range(int(linha[-3])+1):
+    #     if passo == 0:
+    #         saida.write(str(passo) + ' ' + str(lista_y[0]) + '\n')
+    #     else:
+    #         if int(linha[-1]) == 2:
+    #             equacao = lista_y[0] + moulton(funcao,float(linha[-4]),t_atual,int(linha[-1]),lista_y[0]) + ordem_moulton[int(linha[-1])][1]*float(linha[-4])*funcao.evalf(subs={t: t_atual + float(linha[-4]) , y: bashforth(lista_y[0],funcao,float(linha[-4]),t_atual+float(linha[-4]),int(linha[-1]),lista_y[1],lista_y[2])})
+    #         elif int(linha[-1]) == 3:
+    #             equacao = lista_y[0] + moulton(funcao,float(linha[-4]),t_atual,int(linha[-1]),lista_y[0],lista_y[1]) + ordem_moulton[int(linha[-1])][2]*funcao.evalf(subs={t: t_atual+float(linha[-4]), y: bashforth(lista_y[0],funcao,float(linha[-4]),t_atual+float(linha[-4]),int(linha[-1]),lista_y[1],lista_y[2]),lista_y[3]})
+    #         elif int(linha[-1]) == 4:
+    #             equacao = lista_y[0] + moulton(funcao,float(linha[-4]),t_atual,int(linha[-1]),lista_y[0],lista_y[1],lista_y[2]) + ordem_moulton[int(linha[-1])][3]*(funcao.evalf(subs={t: t_atual+float(linha[-4]), y: bashforth(lista_y[0],funcao,float(linha[-4]),t_atual+float(linha[-4]),int(linha[-1]),lista_y[1],lista_y[2]),lista_y[3],lista_y[4]}))
+    #         elif int(linha[-1]) == 5:
+    #             equacao = lista_y[0] + moulton(funcao,float(linha[-4]),t_atual,int(linha[-1]),lista_y[0],lista_y[1],lista_y[2],lista_y[3]) + ordem_moulton[int(linha[-1])][4]*(funcao.evalf(subs={t: t_atual+float(linha[-4]), y: bashforth(lista_y[0],funcao,float(linha[-4]),t_atual+float(linha[-4]),int(linha[-1]),lista_y[1],lista_y[2]),lista_y[3],lista_y[4],lista_y[5]}))
+    #         elif int(linha[-1]) == 6:
+    #             equacao = lista_y[0] + moulton(funcao,float(linha[-4]),t_atual,int(linha[-1]),lista_y[0],lista_y[1],lista_y[2],lista_y[3],lista_y[4]) + ordem_moulton[int(linha[-1])][5]*(funcao.evalf(subs={t: t_atual+float(linha[-4]), y: bashforth(lista_y[0],funcao,float(linha[-4]),t_atual+float(linha[-4]),int(linha[-1]),lista_y[1],lista_y[2]),lista_y[3],lista_y[4],lista_y[5],lista_y[6]}))
+    #         elif int(linha[-1]) == 7:
+    #             equacao = lista_y[0] + moulton(funcao,float(linha[-4]),t_atual,int(linha[-1]),lista_y[0],lista_y[1],lista_y[2],lista_y[3],lista_y[4],lista_y[5]) + ordem_moulton[int(linha[-1])][6]*(funcao.evalf(subs={t: t_atual+float(linha[-4]), y: bashforth(lista_y[0],funcao,float(linha[-4]),t_atual+float(linha[-4]),int(linha[-1]),lista_y[1],lista_y[2]),lista_y[3],lista_y[4],lista_y[5],lista_y[6],lista_y[7]}))
+    #         elif int(linha[-1]) == 8:
+    #             equacao = lista_y[0] + moulton(funcao,float(linha[-4]),t_atual,int(linha[-1]),lista_y[0],lista_y[1],lista_y[2],lista_y[3],lista_y[4],lista_y[5],lista_y[6]) + ordem_moulton[int(linha[-1])][7]*(funcao.evalf(subs={t: t_atual+float(linha[-4]), y: bashforth(lista_y[0],funcao,float(linha[-4]),t_atual+float(linha[-4]),int(linha[-1]),lista_y[1],lista_y[2]),lista_y[3],lista_y[4],lista_y[5],lista_y[6],lista_y[7],lista_y[8]}))
+    #         saida.write(str(passo) + ' ' + str(equacao) + '\n')
+    #         lista_y.pop()
+    #         lista_y.insert(0,equacao)
+    #         t_atual += float(linha[-5])
 
 def moulton(funcao,h,t0,ordem, y1 = 0, y2 = 0, y3 = 0, y4 = 0, y5 = 0, y6 = 0, y7 = 0, y8 = 0):
     return (ordem_moulton[ordem][0]*h*funcao.evalf(subs={t:t0,y:y1}) + ordem_moulton[ordem][1]*h*funcao.evalf(subs={t:t0-h,y:y2}) 
