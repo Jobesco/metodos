@@ -16,36 +16,41 @@ def _euler(y0,t0,h,passos,funcao,escreve):
             if escreve: saida.write(str(passo) + ' ' + str(y_n) + '\n')
     return y_n
 
-def euler_inverso(y0,t0,h,passos,funcao):
+def euler_inverso(y0,t0,h,passos,funcao,escreve):
     y_ant = y0
     t_ant = t0
+    y_n = 0
     for passo in range(passos+1):
         if passo == 0:
-            saida.write(str(passo) + ' ' + str(y0) + '\n')
+            if escreve: saida.write(str(passo) + ' ' + str(y0) + '\n')
         else:
             y_n = y_ant + h*funcao.evalf(subs={t: t_ant + h, y: _euler(y_ant,t_ant,h,1,funcao,false)})
             y_ant = y_n
             t_ant = passo*h
-            saida.write(str(passo) + ' ' + str(y_n) + '\n')
+            if escreve: saida.write(str(passo) + ' ' + str(y_n) + '\n')
+    return y_n
 
-def euler_aprimorado(y0,t0,h,passos,funcao):
+def euler_aprimorado(y0,t0,h,passos,funcao,escreve):
     y_ant = y0
     t_ant = t0
+    y_n = 0
     for passo in range(passos+1):
         if passo == 0:
-            saida.write(str(passo) + ' ' + str(y0) + '\n')
+            if escreve: saida.write(str(passo) + ' ' + str(y0) + '\n')
         else:
             y_n = y_ant + (funcao.evalf(subs={y: _euler(y_ant,t_ant,h,1,funcao,false), t: t_ant + h}) + funcao.evalf(subs={y: y_ant, t: t_ant}))*h/2
             y_ant = y_n
             t_ant = passo*h
-            saida.write(str(passo) + ' ' + str(y_n) + '\n')
+            if escreve: saida.write(str(passo) + ' ' + str(y_n) + '\n')
+    return y_n
 
-def runge_kutta(y0,t0,h,passos,funcao):
+def runge_kutta(y0,t0,h,passos,funcao,escreve):
     y_ant = y0
     t_ant = t0
+    y_n = 0
     for passo in range(passos+1):
         if passo == 0:
-            saida.write(str(passo) + ' ' + str(y0) + '\n')
+            if escreve: saida.write(str(passo) + ' ' + str(y0) + '\n')
         else:
             k1 = funcao.evalf(subs={t: t_ant, y: y_ant})
             k2 = funcao.evalf(subs={t: t_ant + h/2, y: y_ant + h*k1/2})
@@ -54,7 +59,8 @@ def runge_kutta(y0,t0,h,passos,funcao):
             y_n = y_ant + (k1+2*k2+2*k3+k4)*h/6
             y_ant = y_n
             t_ant = passo*h
-            saida.write(str(passo) + ' ' + str(y_n) + '\n')
+            if escreve: saida.write(str(passo) + ' ' + str(y_n) + '\n')
+    return y_n
 
 def adam_bashforth(funcao): #[1] = y(0) , [2] = t(0) , [3] = h , [4] = qtd de passos , [5] = funcao, [6] = ordem
     t_atual = float(linha[-5])
@@ -67,6 +73,55 @@ def adam_bashforth(funcao): #[1] = y(0) , [2] = t(0) , [3] = h , [4] = qtd de pa
     elif int(linha[-1]) == 6: lista_y = [float(linha[1]),float(linha[2]),float(linha[3]),float(linha[4]),float(linha[5]),float(linha[6])]
     elif int(linha[-1]) == 7: lista_y = [float(linha[1]),float(linha[2]),float(linha[3]),float(linha[4]),float(linha[5]),float(linha[6]),float(linha[7])]
     elif int(linha[-1]) == 8: lista_y = [float(linha[1]),float(linha[2]),float(linha[3]),float(linha[4]),float(linha[5]),float(linha[6]),float(linha[7]),float(linha[8])]
+    # lista_y.reverse()
+    for passo in range(int(linha[-3])+1):
+        # print('estou no passo ' + str(passo))
+        if passo < int(linha[-1]):
+            saida.write(str(passo) + ' ' + str(lista_y[passo]) + '\n')
+        else:
+            lista_y.reverse()
+            print(lista_y)
+            if int(linha[-1]) == 2: equacao = bashforth(lista_y[0],funcao,float(linha[-4]),t_atual,int(linha[-1]),lista_y[0],lista_y[1])
+            elif int(linha[-1]) == 3: equacao = bashforth(lista_y[0],funcao,float(linha[-4]),t_atual,int(linha[-1]),lista_y[0],lista_y[1],lista_y[2])
+            elif int(linha[-1]) == 4: equacao = bashforth(lista_y[0],funcao,float(linha[-4]),t_atual,int(linha[-1]),lista_y[0],lista_y[1],lista_y[2],lista_y[3])
+            elif int(linha[-1]) == 5: equacao = bashforth(lista_y[0],funcao,float(linha[-4]),t_atual,int(linha[-1]),lista_y[0],lista_y[1],lista_y[2],lista_y[3],lista_y[4])
+            elif int(linha[-1]) == 6: equacao = bashforth(lista_y[0],funcao,float(linha[-4]),t_atual,int(linha[-1]),lista_y[0],lista_y[1],lista_y[2],lista_y[3],lista_y[4],lista_y[5])
+            elif int(linha[-1]) == 7: equacao = bashforth(lista_y[0],funcao,float(linha[-4]),t_atual,int(linha[-1]),lista_y[0],lista_y[1],lista_y[2],lista_y[3],lista_y[4],lista_y[5],lista_y[6])
+            elif int(linha[-1]) == 8: equacao = bashforth(lista_y[0],funcao,float(linha[-4]),t_atual,int(linha[-1]),lista_y[0],lista_y[1],lista_y[2],lista_y[3],lista_y[4],lista_y[5],lista_y[6],lista_y[7])
+            saida.write(str(passo) + ' ' + str(equacao) + '\n')
+            lista_y.reverse()
+            lista_y.pop(0)
+            lista_y.append(equacao)
+            # lista_y.pop()
+            # lista_y.insert(0,equacao)
+            t_atual += h
+            print(t_atual)
+            
+
+    
+def bashforth(y0,funcao,h,t0,ordem, y1 = 0, y2 = 0, y3 = 0, y4 = 0, y5 = 0, y6 = 0, y7 = 0, y8 = 0):
+    # print( (1901/720)*h*funcao.evalf(subs={t:t0,y:y1}) + (-1387/360)*h*funcao.evalf(subs={t:t0-h,y:y2}) 
+    # + (109/30)*h*funcao.evalf(subs={t:t0-h*2,y:y3}) + (-637/360)*h*funcao.evalf(subs={t:t0-h*3,y:y4}) 
+    # + (251/720)*h*funcao.evalf(subs={t:t0-h*4,y:y5}) )
+    retorno = y0 + ordem_bashforth[ordem][0]*h*funcao.evalf(subs={t:t0,y:y1}) + ordem_bashforth[ordem][1]*h*funcao.evalf(subs={t:t0-h,y:y2})
+    retorno += ordem_bashforth[ordem][2]*h*funcao.evalf(subs={t:t0-h*2,y:y3}) + ordem_bashforth[ordem][3]*h*funcao.evalf(subs={t:t0-h*3,y:y4})
+    retorno += ordem_bashforth[ordem][4]*h*funcao.evalf(subs={t:t0-h*4,y:y5}) + ordem_bashforth[ordem][5]*h*funcao.evalf(subs={t:t0-h*5,y:y6})
+    retorno += ordem_bashforth[ordem][6]*h*funcao.evalf(subs={t:t0-h*6,y:y7}) + ordem_bashforth[ordem][7]*h*funcao.evalf(subs={t:t0-h*7,y:y8})
+    return retorno
+
+def bashforth_metodo(funcao,metodo): #[1] = y(0) , [2] = t(0) , [3] = h , [4] = qtd de passos , [5] = funcao, [6] = ordem
+    t_atual = float(linha[-5])
+    h = float(linha[-4])
+    y0 = float(linha[-6])
+    # saida.write('Metodo de Adam-Bashforth\ny( ' + linha[-5] + ' ) = ' + linha[1] + '\nh = ' + linha[-4] + '\n')
+
+    if int(linha[-1]) == 2: lista_y = get_lista_y(funcao,metodo,2,t_atual,h,y0)
+    elif int(linha[-1]) == 3: lista_y = get_lista_y(funcao,metodo,3,t_atual,h,y0)
+    elif int(linha[-1]) == 4: lista_y = get_lista_y(funcao,metodo,4,t_atual,h,y0)
+    elif int(linha[-1]) == 5: lista_y = get_lista_y(funcao,metodo,5,t_atual,h,y0)
+    elif int(linha[-1]) == 6: lista_y = get_lista_y(funcao,metodo,6,t_atual,h,y0)
+    elif int(linha[-1]) == 7: lista_y = get_lista_y(funcao,metodo,7,t_atual,h,y0)
+    elif int(linha[-1]) == 8: lista_y = get_lista_y(funcao,metodo,8,t_atual,h,y0)
     # lista_y.reverse()
     for passo in range(int(linha[-3])+1):
         print('estou no passo ' + str(passo))
@@ -89,18 +144,23 @@ def adam_bashforth(funcao): #[1] = y(0) , [2] = t(0) , [3] = h , [4] = qtd de pa
             # lista_y.pop()
             # lista_y.insert(0,equacao)
             t_atual += h
-            
 
-    
-def bashforth(y0,funcao,h,t0,ordem, y1 = 0, y2 = 0, y3 = 0, y4 = 0, y5 = 0, y6 = 0, y7 = 0, y8 = 0):
-    # print( (1901/720)*h*funcao.evalf(subs={t:t0,y:y1}) + (-1387/360)*h*funcao.evalf(subs={t:t0-h,y:y2}) 
-    # + (109/30)*h*funcao.evalf(subs={t:t0-h*2,y:y3}) + (-637/360)*h*funcao.evalf(subs={t:t0-h*3,y:y4}) 
-    # + (251/720)*h*funcao.evalf(subs={t:t0-h*4,y:y5}) )
-    retorno = y0 + ordem_bashforth[ordem][0]*h*funcao.evalf(subs={t:t0,y:y1}) + ordem_bashforth[ordem][1]*h*funcao.evalf(subs={t:t0-h,y:y2})
-    retorno += ordem_bashforth[ordem][2]*h*funcao.evalf(subs={t:t0-h*2,y:y3}) + ordem_bashforth[ordem][3]*h*funcao.evalf(subs={t:t0-h*3,y:y4})
-    retorno += ordem_bashforth[ordem][4]*h*funcao.evalf(subs={t:t0-h*4,y:y5}) + ordem_bashforth[ordem][5]*h*funcao.evalf(subs={t:t0-h*5,y:y6})
-    retorno += ordem_bashforth[ordem][6]*h*funcao.evalf(subs={t:t0-h*6,y:y7}) + ordem_bashforth[ordem][7]*h*funcao.evalf(subs={t:t0-h*7,y:y8})
-    return retorno
+def get_lista_y(funcao,metodo,indices,t0,h,y0): #passa y0,t0,h // y0,t0,h,passos,funcao,escreve
+    lista_y = []
+    if metodo == 'adam_bashforth_by_euler':
+        for passo in range(indices+1):
+            lista_y[passo] = _euler(y0,t0,h,1,funcao,false)
+    elif metodo == 'adam_bashforth_by_euler_inverso':
+        for passo in range(indices+1):
+            lista_y[passo] = euler_inverso(y0,t0,h,1,funcao,false)
+    elif metodo == 'adam_bashforth_by_euler_aprimorado':
+        for passo in range(indices+1):
+            lista_y[passo] = euler_aprimorado(y0,t0,h,1,funcao,false)
+    elif metodo == 'adam_bashforth_by_runge_kutta':
+        for passo in range(indices+1):
+            lista_y[passo] = runge_kutta(y0,t0,h,1,funcao,false)
+    return lista_y
+
 
 def adam_moulton(funcao): #use bashforth p prever
     t_atual = float(linha[-5])
@@ -179,19 +239,27 @@ for linha_toda in linhas_entrada:
     
     elif linha[0] == 'euler_inverso':
         saida.write('Metodo de Euler Inverso\ny( ' + linha[2] + ' ) = ' + linha[1] + '\nh = ' + linha[3] + '\n')
-        euler_inverso(float(linha[1]),float(linha[2]),float(linha[3]),int(linha[4]),sympify(linha[5]))
+        euler_inverso(float(linha[1]),float(linha[2]),float(linha[3]),int(linha[4]),sympify(linha[5]),true)
     
     elif linha[0] == 'euler_aprimorado':
         saida.write('Metodo de Euler Aprimorado\ny( ' + linha[2] + ' ) = ' + linha[1] + '\nh = ' + linha[3] + '\n')
-        euler_aprimorado(float(linha[1]),float(linha[2]),float(linha[3]),int(linha[4]),sympify(linha[5]))
+        euler_aprimorado(float(linha[1]),float(linha[2]),float(linha[3]),int(linha[4]),sympify(linha[5]),true)
     
     elif linha[0] == 'runge_kutta':
         saida.write('Metodo de Runge-Kutta\ny( ' + linha[2] + ' ) = ' + linha[1] + '\nh = ' + linha[3] + '\n')
-        runge_kutta(float(linha[1]),float(linha[2]),float(linha[3]),int(linha[4]),sympify(linha[5])) #4a ordem
+        runge_kutta(float(linha[1]),float(linha[2]),float(linha[3]),int(linha[4]),sympify(linha[5]),true) #4a ordem
     
     elif linha[0] == 'adam_bashforth': #[6] = ordem
         adam_bashforth(sympify(linha[-2]))
-        
+
+    elif linha[0] == 'adam_bashforth_by_euler':
+        bashforth_metodo(simpify(linha[5]),linha[0])
+    elif linha[0] == 'adam_bashforth_by_euler_inverso':
+        bashforth_metodo(simpify(linha[5]),linha[0])
+    elif linha[0] == 'adam_bashforth_by_euler_aprimorado':
+        bashforth_metodo(simpify(linha[5]),linha[0])
+    elif linha[0] == 'adam_bashforth_by_runge_kutta':
+        bashforth_metodo(simpify(linha[5]),linha[0])
     # elif linha[0] == 'adam_moulton':
 
     # elif linha[0] == 'formula_inversa':
